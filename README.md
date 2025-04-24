@@ -13,7 +13,7 @@ var builder = DistributedApplication.CreateBuilder(args);
 builder.AddProject<Projects.ConsoleApp1>("consoleapp1");
 
 var storage = builder.AddAzureStorage("storage").RunAsEmulator();
-var blob = storage.AddBlobs("blob");
+var blob = storage.AddBlobs("myblob");
 
 var ps = builder.AddPowerShell("ps")
     .WithReference(blob)
@@ -25,10 +25,14 @@ var script = ps.AddScript("script1", """
     # uncommenting this will hang the script if you don't attach the pwsh debugger
     # wait-debugger
 
-    write-information "blob is $blob"
+    write-information "`$myblob is $myblob"
 """);
 
 builder.Build().Run();
 ```
 
 ## Debugging
+
+While your Apphost is running a script that is waiting via `Wait-Debugger`, open a terminal with powershell (pwsh) 7.4 or later (win, osx, linux) and use `Get-PSHostProcessInfo`, `Enter-PSHostProcess`, `Get-Runspace` and `Debug-Runspace` to connect the debugger. 
+
+See https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/enter-pshostprocess?view=powershell-7.5 for more information.
