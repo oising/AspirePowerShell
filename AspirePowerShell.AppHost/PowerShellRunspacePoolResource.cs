@@ -1,0 +1,128 @@
+﻿using System.Globalization;
+using System.Management.Automation;
+using System.Management.Automation.Host;
+using System.Management.Automation.Runspaces;
+using Microsoft.Extensions.Logging;
+
+namespace AspirePowerShell.AppHost;
+
+public class PowerShellRunspacePoolResource : Resource, IDisposable, IResourceWithWaitSupport
+{
+    public PSLanguageMode LanguageMode { get; }
+    public int MinRunspaces { get; }
+    public int MaxRunspaces { get; }
+
+    public RunspacePool? Pool { get; private set; }
+
+    public PowerShellRunspacePoolResource(
+        [ResourceName] string name,
+        PSLanguageMode languageMode = PSLanguageMode.ConstrainedLanguage,
+        int minRunspaces = 1,
+        int maxRunspaces = 5) : base(name)
+    {
+        LanguageMode = languageMode;
+        MinRunspaces = minRunspaces;
+        MaxRunspaces = maxRunspaces;
+    }
+
+    internal Task StartAsync(InitialSessionState sessionState, ResourceNotificationService notificationService, ILogger logger, CancellationToken token = default)
+    {
+        sessionState.LanguageMode = this.LanguageMode;
+        sessionState.AuthorizationManager = new AuthorizationManager("Aspire");
+        Pool = RunspaceFactory.CreateRunspacePool(MinRunspaces, MaxRunspaces, sessionState, new AspirePSHost(logger));
+
+        ConfigureStateChangeNotifications(notificationService, logger);
+
+        return Task.Factory.FromAsync(Pool.BeginOpen, Pool.EndOpen, null);
+    }
+
+    private void ConfigureStateChangeNotifications(ResourceNotificationService notificationService, ILogger logger)
+    {
+        Pool!.StateChanged += async (sender, args) =>
+        {
+            var poolState = args.RunspacePoolStateInfo.State;
+            var reason = args.RunspacePoolStateInfo.Reason;
+
+            logger.LogInformation(
+                "Runspace pool '{PoolName}' state changed to '{RunspacePoolState}'", Name, poolState);
+
+            // map args.RunspacePoolStateInfo.State to a KnownResourceState
+            // and publish the update
+
+            var knownState = poolState switch
+            {
+                RunspacePoolState.BeforeOpen => KnownResourceStates.NotStarted,
+                RunspacePoolState.Opening => KnownResourceStates.Starting,
+                RunspacePoolState.Opened => KnownResourceStates.Running,
+                RunspacePoolState.Closing => KnownResourceStates.Stopping,
+                RunspacePoolState.Closed => KnownResourceStates.Exited,
+                RunspacePoolState.Broken => KnownResourceStates.FailedToStart,
+                _ => throw new ArgumentOutOfRangeException(
+                    nameof(poolState), poolState, $"Unexpected runspace pool state {poolState}")
+            };
+
+            await notificationService.PublishUpdateAsync(this,
+                state => state with
+                {
+                    State = knownState,
+                    Properties = [.. state.Properties,
+                        new("RunspacePoolState", poolState.ToString()),
+                        new("Reason", reason?.ToString() ?? string.Empty)
+                    ]
+                });
+        };
+    }
+
+    // absolutely brain dead and deficient (minimal) PSHost implementation
+    private class AspirePSHost(ILogger logger) : PSHost
+    {
+        public override void SetShouldExit(int exitCode)
+        {
+            logger.LogInformation("AspirePSHost: SetShouldExit({ExitCode})", exitCode);
+        }
+
+        public override void EnterNestedPrompt()
+        {
+            throw new NotSupportedException();
+        }
+
+        public override void ExitNestedPrompt()
+        {
+            throw new NotSupportedException();
+        }
+
+        public override void NotifyBeginApplication()
+        {
+            logger.LogInformation("AspirePSHost: NotifyBeginApplication");
+        }
+
+        public override void NotifyEndApplication()
+        {
+            logger.LogInformation("AspirePSHost: NotifyEndApplication");
+        }
+
+        public override string Name { get; } = "AspirePSHost";
+        public override Version Version { get; } = new (0, 1);
+        public override Guid InstanceId { get; } = Guid.NewGuid();
+        public override PSHostUserInterface UI => null!; // interaction not supported
+        public override CultureInfo CurrentCulture { get; } = CultureInfo.CurrentCulture;
+        public override CultureInfo CurrentUICulture { get; } = CultureInfo.CurrentUICulture;
+    }
+
+    public void Dispose()
+    {
+        Pool?.Close();
+        Pool?.Dispose();
+    }
+}
+
+public static class PowerShellResourceBuilderExtensions
+{
+    public static IResourceBuilder<PowerShellRunspacePoolResource> WithModule(
+        this IResourceBuilder<PowerShellRunspacePoolResource> builder,
+        string moduleName)
+    {
+        // NOP
+        return builder;
+    }
+}
