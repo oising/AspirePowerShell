@@ -1,5 +1,4 @@
 ﻿using Aspire.Hosting.Lifecycle;
-using Microsoft.Extensions.Logging;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 
@@ -31,15 +30,11 @@ internal class PowerShellRunspacePoolLifecycleHook(ResourceNotificationService n
             var poolName = poolResource.Name;
             var poolLogger = loggerService.GetLogger(poolName);
 
-            tasks.Add(
-                notificationService.WaitForDependenciesAsync(poolResource, cancellationToken)
+            _ = notificationService.WaitForDependenciesAsync(poolResource, cancellationToken)
                 .ContinueWith(
-                    async (state) => await
-                poolResource.StartAsync(sessionState, notificationService, poolLogger, cancellationToken),
-                    cancellationToken));
+                    async (state) =>
+                        await poolResource.StartAsync(sessionState, notificationService, poolLogger, cancellationToken),
+                    cancellationToken);
         }
-
-        // don't block lifecycle hook
-        _ = Task.Run(async () => await Task.WhenAll(tasks), cancellationToken);
     }
 }

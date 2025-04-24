@@ -17,19 +17,17 @@ internal class PowerShellScriptLifecycleHook(ResourceNotificationService notific
             {
                 // TODO: capture script streams and log them
                 scriptLogger.LogInformation("Starting script '{ScriptName}'", scriptName);
-                tasks.Add(
-                    notificationService
-                    .WaitForDependenciesAsync(resource, cancellationToken)
-                    .ContinueWith(
-                        async (state) => await resource.StartAsync(scriptLogger, notificationService, cancellationToken),
-                        cancellationToken));
+
+                _ =  notificationService
+                        .WaitForDependenciesAsync(resource, cancellationToken)
+                        .ContinueWith(
+                            async (state) => await resource.StartAsync(scriptLogger, notificationService, cancellationToken),
+                            cancellationToken);
             }
             catch (Exception ex)
             {
                 scriptLogger.LogError(ex, "Failed to start script '{ScriptName}'", scriptName);
             }
         }
-        
-        _ = Task.Run(async () => await Task.WhenAll(tasks), cancellationToken);
     }
 }
