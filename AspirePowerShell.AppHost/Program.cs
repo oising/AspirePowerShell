@@ -18,6 +18,13 @@ var script = ps.AddScript("script1", """
     # wait-debugger
 
     write-information "`$myblob is $myblob"
+
+    az storage container create --connection-string $myblob -n demo
+    az storage blob upload --connection-string $myblob -c demo --file ..\README.md
+
+    write-information $pwd
+
+    write-information "Blob uploaded"
 """);
 
 builder.Build().Run();
