@@ -1,82 +1,45 @@
 ﻿using Aspire.Hosting.Lifecycle;
 using Microsoft.Extensions.Logging;
+using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 
 namespace AspirePowerShell.AppHost;
 
 internal class PowerShellRunspacePoolLifecycleHook(ResourceNotificationService notificationService, ResourceLoggerService loggerService) : IDistributedApplicationLifecycleHook
 {
-    public async Task BeforeStartAsync(DistributedApplicationModel appModel, CancellationToken cancellationToken)
+    public async Task AfterEndpointsAllocatedAsync(DistributedApplicationModel appModel, CancellationToken cancellationToken)
     {
         var pools = appModel.Resources.OfType<PowerShellRunspacePoolResource>().ToList();
         var tasks = new List<Task>(pools.Count);
 
-        foreach (var resource in pools) {
-            var poolName = resource.Name;
+        foreach (var poolResource in pools)
+        {
+            var sessionState = InitialSessionState.CreateDefault();
+
+            foreach (var annotation in poolResource.Annotations)
+            {
+                if (annotation is PowerShellVariableReferenceAnnotation<ConnectionStringReference> reference)
+                {
+                    var connectionString = await reference.Value.Resource.GetConnectionStringAsync(cancellationToken);
+                    sessionState.Variables.Add(
+                        new SessionStateVariableEntry(reference.Name, connectionString,
+                        $"ConnectionString for {reference.Value.Resource.GetType().Name} '{reference.Name}'",
+                        ScopedItemOptions.ReadOnly | ScopedItemOptions.AllScope));
+                }
+            }
+
+            var poolName = poolResource.Name;
             var poolLogger = loggerService.GetLogger(poolName);
 
-            resource.Pool.StateChanged += async (sender, args) =>
-            {
-                var poolState = args.RunspacePoolStateInfo.State;
-                var reason = args.RunspacePoolStateInfo.Reason;
-
-                poolLogger.LogInformation(
-                    "Runspace pool '{PoolName}' state changed to '{RunspacePoolState}'", poolName, poolState);
-
-                // map args.RunspacePoolStateInfo.State to a KnownResourceState
-                // and publish the update
-
-                var knownState = poolState switch
-                {
-                    RunspacePoolState.BeforeOpen => KnownResourceStates.NotStarted,
-                    RunspacePoolState.Opening => KnownResourceStates.Starting,
-                    RunspacePoolState.Opened => KnownResourceStates.Running,
-                    RunspacePoolState.Closing => KnownResourceStates.Stopping,
-                    RunspacePoolState.Closed => KnownResourceStates.Exited,
-                    RunspacePoolState.Broken => KnownResourceStates.FailedToStart,
-                    _ => throw new ArgumentOutOfRangeException(
-                        nameof(poolState), poolState, "Unexpected runspace pool state")
-                };
-
-                await notificationService.PublishUpdateAsync(resource,
-                    state => state with
-                    {
-                        State = knownState,
-                        Properties = [.. state.Properties,
-                        new("RunspacePoolState", poolState.ToString()),
-                        new("Reason", reason?.ToString() ?? string.Empty)
-                        ]
-                    });
-            };
-
-            tasks.Add(Task.Run(() =>
-            {
-                try
-                {
-                    poolLogger.LogInformation("Opening runspace pool '{PoolName}'", poolName);
-                    resource.Pool.Open();
-                }
-                catch (Exception ex)
-                {
-                    poolLogger.LogError(ex, "Failed to open runspace pool '{PoolName}'", poolName);
-                }
-            }, cancellationToken));
+            tasks.Add(
+                notificationService.WaitForDependenciesAsync(poolResource, cancellationToken)
+                .ContinueWith(
+                    async (state) => await
+                poolResource.StartAsync(sessionState, notificationService, poolLogger, cancellationToken),
+                    cancellationToken));
         }
 
-        await Task.WhenAll(tasks);
-
-        var scripts = appModel.Resources.OfType<PowerShellScriptResource>().ToList();
-
-        foreach (var script in scripts)
-        {
-          
-            //var scriptBlock = script.ScriptBlock;
-            //var runspacePool = scriptResource.Pool;
-            //await runspacePool.OpenAsync(cancellationToken);
-            //await scriptBlock.InvokeAsync(runspacePool, cancellationToken);
-        }
-
+        // don't block lifecycle hook
+        _ = Task.Run(async () => await Task.WhenAll(tasks), cancellationToken);
     }
-
-    
 }

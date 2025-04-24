@@ -26,6 +26,7 @@ public static class DistributedApplicationBuilderExtensions
         }
 
         builder.Services.TryAddLifecycleHook<PowerShellRunspacePoolLifecycleHook>();
+        builder.Services.TryAddLifecycleHook<PowerShellScriptLifecycleHook>();
 
         var pool = new PowerShellRunspacePoolResource(name, languageMode, minRunspaces, maxRunspaces);
 
@@ -40,6 +41,7 @@ public static class DistributedApplicationBuilderExtensions
                     new ("MinRunspaces", pool.MinRunspaces.ToString()),
                     new ("MaxRunspaces", pool.MaxRunspaces.ToString())
                 ]
-            });
+            })
+            .ExcludeFromManifest();
     }
 }

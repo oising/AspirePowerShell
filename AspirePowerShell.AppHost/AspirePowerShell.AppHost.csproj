@@ -14,7 +14,7 @@
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.AppHost" Version="9.2.0" />
     <PackageReference Include="Aspire.Hosting.Azure.Storage" Version="9.2.0" />
-    <PackageReference Include="System.Management.Automation" Version="7.5.0" />
+    <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.5.0" />
   </ItemGroup>
 
   <ItemGroup>

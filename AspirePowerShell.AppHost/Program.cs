@@ -1,25 +1,23 @@
-using System.Management.Automation;
 using AspirePowerShell.AppHost;
-using Microsoft.Extensions.Azure;
 
 var builder = DistributedApplication.CreateBuilder(args);
-
-var ps = builder.AddPowerShell("ps")
-    .WithModule("Az");
 
 builder.AddProject<Projects.ConsoleApp1>("consoleapp1");
 
 var storage = builder.AddAzureStorage("storage").RunAsEmulator();
 var blob = storage.AddBlobs("blob");
 
-var script = ps.AddScript("script1", """
-    write-host "Hello, world"
-    wait-debugger
-    write-host "blob is $blob"
-""")
+var ps = builder.AddPowerShell("ps")
     .WithReference(blob)
-    .WithParentRelationship(ps)
     .WaitFor(storage);
+
+var script = ps.AddScript("script1", """
+    write-information "Hello, world"
+
+    wait-debugger
+
+    write-information "blob is $blob"
+""");
 
 builder.Build().Run();
 
