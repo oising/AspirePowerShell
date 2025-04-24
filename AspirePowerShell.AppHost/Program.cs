@@ -14,7 +14,7 @@ var ps = builder.AddPowerShell("ps")
 var script = ps.AddScript("script1", """
     write-information "Hello, world"
 
-    wait-debugger
+    #wait-debugger
 
     write-information "blob is $blob"
 """);
