@@ -12,7 +12,10 @@ var ps = builder.AddPowerShell("ps")
     .WaitFor(storage);
 
 var script = ps.AddScript("script1", """
+    param($x, $y)
+
     write-information "Hello, world"
+    write-warning "This is a warning that $x + $y = $($x+ $y)"
 
     # uncommenting this will hang the script if you don't attach the pwsh debugger
     # wait-debugger
@@ -25,7 +28,7 @@ var script = ps.AddScript("script1", """
     write-information $pwd
 
     write-information "Blob uploaded"
-""");
+""").WithArgs(2, 2);
 
 builder.Build().Run();
 

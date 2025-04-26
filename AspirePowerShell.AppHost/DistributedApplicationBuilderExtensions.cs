@@ -6,6 +6,17 @@ namespace AspirePowerShell.AppHost;
 
 public static class DistributedApplicationBuilderExtensions
 {
+    /// <summary>
+    /// Adds a PowerShell runspace pool resource to the distributed application.
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <param name="name"></param>
+    /// <param name="languageMode"></param>
+    /// <param name="minRunspaces"></param>
+    /// <param name="maxRunspaces"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
+    /// <exception cref="DistributedApplicationException"></exception>
     public static IResourceBuilder<PowerShellRunspacePoolResource> AddPowerShell(
         this IDistributedApplicationBuilder builder,
         [ResourceName] string name,

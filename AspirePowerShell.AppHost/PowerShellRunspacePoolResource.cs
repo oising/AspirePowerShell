@@ -6,6 +6,9 @@ using Microsoft.Extensions.Logging;
 
 namespace AspirePowerShell.AppHost;
 
+/// <summary>
+/// Represents a PowerShell runspace pool resource.
+/// </summary>
 public class PowerShellRunspacePoolResource : Resource, IDisposable, IResourceWithWaitSupport
 {
     public PSLanguageMode LanguageMode { get; }
@@ -126,3 +129,4 @@ public static class PowerShellResourceBuilderExtensions
         return builder;
     }
 }
+

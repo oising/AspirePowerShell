@@ -1,13 +1,14 @@
-﻿using System.ComponentModel;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Management.Automation;
+using Aspire.Hosting.ApplicationModel;
 using Microsoft.Extensions.Logging;
 
 namespace AspirePowerShell.AppHost
 {
     public class PowerShellScriptResource : Resource, IDisposable,
         IResourceWithEnvironment,
-        IResourceWithWaitSupport
+        IResourceWithWaitSupport,
+        IResourceWithArgs
     {
         private readonly PowerShell _ps;
         private readonly CancellationTokenSource _cts;
@@ -65,6 +66,14 @@ namespace AspirePowerShell.AppHost
                     ],
                 });
             };
+            
+            if (this.TryGetLastAnnotation<PowerShellScriptArgsAnnotation>(out var args))
+            {
+                foreach (var arg in args.Args)
+                {
+                    _ps.AddArgument(arg);
+                }
+            }
 
             // Use Task.Factory.FromAsync to convert the APM pattern to Task
             await Task.Factory.FromAsync(
@@ -121,7 +130,9 @@ namespace AspirePowerShell.AppHost
 
         void IDisposable.Dispose()
         {
+            _ps.Stop();
             _ps.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }
