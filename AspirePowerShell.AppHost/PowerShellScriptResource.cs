@@ -68,18 +68,18 @@ namespace AspirePowerShell.AppHost
                 });
             };
             
-            if (this.TryGetLastAnnotation<PowerShellScriptArgsAnnotation>(out var args))
+            if (this.TryGetLastAnnotation<PowerShellScriptArgsAnnotation>(out var scriptArgsAnnotation))
             {
-                foreach (var arg in args.Args)
+                foreach (var scriptArg in scriptArgsAnnotation.Args)
                 {
-                    if (arg is IValueProvider valueProvider)
+                    if (scriptArg is IValueProvider valueProvider)
                     {
                         var value = await valueProvider.GetValueAsync(cancellationToken);
                         _ps.AddArgument(value);
                     }
                     else
                     {
-                        _ps.AddArgument(arg);
+                        _ps.AddArgument(scriptArg);
                     }
                 }
             }
