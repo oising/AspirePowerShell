@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Management.Automation;
 using Aspire.Hosting.ApplicationModel;
+using Humanizer.Localisation;
 using Microsoft.Extensions.Logging;
 
 namespace AspirePowerShell.AppHost
@@ -71,7 +72,15 @@ namespace AspirePowerShell.AppHost
             {
                 foreach (var arg in args.Args)
                 {
-                    _ps.AddArgument(arg);
+                    if (arg is IValueProvider valueProvider)
+                    {
+                        var value = await valueProvider.GetValueAsync(cancellationToken);
+                        _ps.AddArgument(value);
+                    }
+                    else
+                    {
+                        _ps.AddArgument(arg);
+                    }
                 }
             }
 
