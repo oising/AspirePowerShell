@@ -27,7 +27,7 @@ var script = ps.AddScript("script1", """
     write-information "Hello, world"
     write-warning "This is a warning that $x + $y = $($x+ $y)"
 
-    # uncommenting this will hang the script if you don't attach the pwsh debugger
+    # uncommenting this will hang the script if you don't subsequently attach the pwsh debugger
     # wait-debugger
 
     # automatic variable from WithReference(blob)
