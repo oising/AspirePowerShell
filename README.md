@@ -22,11 +22,15 @@ var ps = builder.AddPowerShell("ps")
     .WaitFor(storage);
 
 var script = ps.AddScript("script1", """
+    param($x, $y)
+
     write-information "Hello, world"
+    write-warning "This is a warning that $x + $y = $($x+ $y)"
 
     # uncommenting this will hang the script if you don't subsequently attach the pwsh debugger
     # wait-debugger
 
+    # automatic variable from WithReference(blob)
     write-information "`$myblob is $myblob"
 
     az storage container create --connection-string $myblob -n demo
@@ -35,7 +39,7 @@ var script = ps.AddScript("script1", """
     write-information $pwd
 
     write-information "Blob uploaded"
-""");
+""").WithArgs(2, 2); // param($x, $y)
 
 builder.Build().Run();
 ```
