@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspirePowerShell.ServiceDef
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nivot.Aspire.Hosting.PowerShell", "Nivot.Aspire.Hosting.PowerShell\Nivot.Aspire.Hosting.PowerShell.csproj", "{0DA8168C-B59C-435B-A33D-82429C0C4697}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{89E03BCB-9FC6-47D0-8148-C105499E6D49} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{47757321-6F07-0296-B8AB-1D554E508D8C} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {379A00A0-3CE5-4079-A766-E113F48114FB}
