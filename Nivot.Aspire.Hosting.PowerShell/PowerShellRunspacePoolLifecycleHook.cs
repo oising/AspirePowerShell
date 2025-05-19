@@ -1,15 +1,15 @@
-﻿using Aspire.Hosting.Lifecycle;
-using System.Management.Automation;
+﻿using System.Management.Automation;
 using System.Management.Automation.Runspaces;
+using Aspire.Hosting.ApplicationModel;
+using Aspire.Hosting.Lifecycle;
 
-namespace AspirePowerShell.AppHost;
+namespace Nivot.Aspire.Hosting.PowerShell;
 
 internal class PowerShellRunspacePoolLifecycleHook(ResourceNotificationService notificationService, ResourceLoggerService loggerService) : IDistributedApplicationLifecycleHook
 {
     public async Task AfterEndpointsAllocatedAsync(DistributedApplicationModel appModel, CancellationToken cancellationToken)
     {
         var pools = appModel.Resources.OfType<PowerShellRunspacePoolResource>().ToList();
-        var tasks = new List<Task>(pools.Count);
 
         foreach (var poolResource in pools)
         {
@@ -32,7 +32,7 @@ internal class PowerShellRunspacePoolLifecycleHook(ResourceNotificationService n
 
             _ = notificationService.WaitForDependenciesAsync(poolResource, cancellationToken)
                 .ContinueWith(
-                    async (state) =>
+                    async _ =>
                         await poolResource.StartAsync(sessionState, notificationService, poolLogger, cancellationToken),
                     cancellationToken);
         }

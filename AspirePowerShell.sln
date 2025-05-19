@@ -6,9 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspirePowerShell.AppHost", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspirePowerShell.ServiceDefaults", "AspirePowerShell.ServiceDefaults\AspirePowerShell.ServiceDefaults.csproj", "{47757321-6F07-0296-B8AB-1D554E508D8C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{3011799F-557A-4ABC-9DDD-0DC2A78089CE}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication1", "WebApplication1\WebApplication1.csproj", "{32A24EFF-0294-49F7-8E39-DC486416195D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nivot.Aspire.Hosting.PowerShell", "Nivot.Aspire.Hosting.PowerShell\Nivot.Aspire.Hosting.PowerShell.csproj", "{0DA8168C-B59C-435B-A33D-82429C0C4697}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,14 +22,10 @@ Global
 		{47757321-6F07-0296-B8AB-1D554E508D8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{47757321-6F07-0296-B8AB-1D554E508D8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{47757321-6F07-0296-B8AB-1D554E508D8C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3011799F-557A-4ABC-9DDD-0DC2A78089CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3011799F-557A-4ABC-9DDD-0DC2A78089CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3011799F-557A-4ABC-9DDD-0DC2A78089CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3011799F-557A-4ABC-9DDD-0DC2A78089CE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{32A24EFF-0294-49F7-8E39-DC486416195D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{32A24EFF-0294-49F7-8E39-DC486416195D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{32A24EFF-0294-49F7-8E39-DC486416195D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{32A24EFF-0294-49F7-8E39-DC486416195D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DA8168C-B59C-435B-A33D-82429C0C4697}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DA8168C-B59C-435B-A33D-82429C0C4697}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DA8168C-B59C-435B-A33D-82429C0C4697}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DA8168C-B59C-435B-A33D-82429C0C4697}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

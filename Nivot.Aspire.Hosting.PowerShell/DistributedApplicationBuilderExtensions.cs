@@ -1,8 +1,10 @@
 ﻿using System.Globalization;
 using System.Management.Automation;
+using Aspire.Hosting;
+using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Lifecycle;
 
-namespace AspirePowerShell.AppHost;
+namespace Nivot.Aspire.Hosting.PowerShell;
 
 public static class DistributedApplicationBuilderExtensions
 {

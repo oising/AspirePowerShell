@@ -1,8 +1,9 @@
 ﻿using System.Diagnostics;
 using System.Management.Automation;
+using Aspire.Hosting.ApplicationModel;
 using Microsoft.Extensions.Logging;
 
-namespace AspirePowerShell.AppHost
+namespace Nivot.Aspire.Hosting.PowerShell
 {
     /// <summary>
     /// Represents a PowerShell script resource.
@@ -12,9 +13,7 @@ namespace AspirePowerShell.AppHost
         IResourceWithWaitSupport,
         IResourceWithArgs
     {
-        private const int ScriptBreakTimeout = 5; // seconds
-
-        private readonly PowerShell _ps;
+        private readonly System.Management.Automation.PowerShell _ps;
         private readonly CancellationTokenSource _cts;
         private readonly PowerShellRunspacePoolResource _parent;
         private readonly PSDataCollection<PSObject> _output;
@@ -34,7 +33,7 @@ namespace AspirePowerShell.AppHost
         {
             _parent = parent;
             _cts = new CancellationTokenSource();
-            _ps = PowerShell.Create();
+            _ps = System.Management.Automation.PowerShell.Create();
 
             // stop the powershell instance when _cts is cancelled
             _cts.Token.Register(() =>

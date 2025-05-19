@@ -1,8 +1,6 @@
-using AspirePowerShell.AppHost;
+using Nivot.Aspire.Hosting.PowerShell;
 
 var builder = DistributedApplication.CreateBuilder(args);
-
-builder.AddProject<Projects.ConsoleApp1>("consoleapp1");
 
 var storage = builder.AddAzureStorage("storage").RunAsEmulator();
 var blob = storage.AddBlobs("myblob");

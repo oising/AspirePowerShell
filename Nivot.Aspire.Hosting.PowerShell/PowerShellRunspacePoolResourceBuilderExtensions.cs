@@ -1,6 +1,8 @@
 ﻿using System.Management.Automation;
+using Aspire.Hosting;
+using Aspire.Hosting.ApplicationModel;
 
-namespace AspirePowerShell.AppHost;
+namespace Nivot.Aspire.Hosting.PowerShell;
 
 /// <summary>
 /// Extensions for the PowerShellRunspacePoolResourceBuilder.
@@ -42,7 +44,7 @@ public static class PowerShellRunspacePoolResourceBuilderExtensions
             })
             .ExcludeFromManifest()
             .WithCommand("break", "Stop script execution",
-            async execContext =>
+            async _ =>
             {
                 await scriptResource.BreakAsync();
                 return CommandResults.Success();

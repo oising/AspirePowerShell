@@ -1,8 +1,11 @@
-﻿using System.Runtime.CompilerServices;
+﻿using Aspire.Hosting.ApplicationModel;
 
-namespace AspirePowerShell.AppHost;
+namespace Nivot.Aspire.Hosting.PowerShell;
 
 
+/// <summary>
+/// PowerShell script resource builder extensions.
+/// </summary>
 public static class PowerShellScriptResourceBuilderExtensions
 {
     /// <summary>
@@ -18,5 +21,9 @@ public static class PowerShellScriptResourceBuilderExtensions
     }
 }
 
+/// <summary>
+/// Represents the arguments for a PowerShell script resource.
+/// </summary>
+/// <param name="Args"></param>
 public record PowerShellScriptArgsAnnotation(object[] Args) : IResourceAnnotation;
 

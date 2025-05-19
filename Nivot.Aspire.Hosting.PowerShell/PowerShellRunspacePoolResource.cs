@@ -2,31 +2,26 @@
 using System.Management.Automation;
 using System.Management.Automation.Host;
 using System.Management.Automation.Runspaces;
+using Aspire.Hosting.ApplicationModel;
 using Microsoft.Extensions.Logging;
 
-namespace AspirePowerShell.AppHost;
+namespace Nivot.Aspire.Hosting.PowerShell;
 
 /// <summary>
 /// Represents a PowerShell runspace pool resource.
 /// </summary>
-public class PowerShellRunspacePoolResource : Resource, IDisposable, IResourceWithWaitSupport
+public class PowerShellRunspacePoolResource(
+    [ResourceName] string name,
+    PSLanguageMode languageMode = PSLanguageMode.ConstrainedLanguage,
+    int minRunspaces = 1,
+    int maxRunspaces = 5)
+    : Resource(name), IDisposable, IResourceWithWaitSupport
 {
-    public PSLanguageMode LanguageMode { get; }
-    public int MinRunspaces { get; }
-    public int MaxRunspaces { get; }
+    public PSLanguageMode LanguageMode { get; } = languageMode;
+    public int MinRunspaces { get; } = minRunspaces;
+    public int MaxRunspaces { get; } = maxRunspaces;
 
     public RunspacePool? Pool { get; private set; }
-
-    public PowerShellRunspacePoolResource(
-        [ResourceName] string name,
-        PSLanguageMode languageMode = PSLanguageMode.ConstrainedLanguage,
-        int minRunspaces = 1,
-        int maxRunspaces = 5) : base(name)
-    {
-        LanguageMode = languageMode;
-        MinRunspaces = minRunspaces;
-        MaxRunspaces = maxRunspaces;
-    }
 
     internal Task StartAsync(InitialSessionState sessionState, ResourceNotificationService notificationService, ILogger logger, CancellationToken token = default)
     {
@@ -41,7 +36,7 @@ public class PowerShellRunspacePoolResource : Resource, IDisposable, IResourceWi
 
     private void ConfigureStateChangeNotifications(ResourceNotificationService notificationService, ILogger logger)
     {
-        Pool!.StateChanged += async (sender, args) =>
+        Pool!.StateChanged += async (_, args) =>
         {
             var poolState = args.RunspacePoolStateInfo.State;
             var reason = args.RunspacePoolStateInfo.Reason;
