@@ -25,10 +25,10 @@ public static class PowerShellRunspacePoolResourceBuilderExtensions
         // parse to force an early exception if the script is invalid
         var scriptBlock = ScriptBlock.Create(script);
 
-        var resource = new PowerShellScriptResource(name, scriptBlock, builder.Resource);
+        var scriptResource = new PowerShellScriptResource(name, scriptBlock, builder.Resource);
 
         return builder.ApplicationBuilder
-            .AddResource(resource)
+            .AddResource(scriptResource)
             .WaitFor(builder) // wait for pool resource
             .WithParentRelationship(builder.Resource) // owned by pool
             .WithInitialState(new()
@@ -40,7 +40,25 @@ public static class PowerShellRunspacePoolResourceBuilderExtensions
                     new("RunspacePool", builder.Resource.Name)
                 ]
             })
-            .ExcludeFromManifest();
+            .ExcludeFromManifest()
+            .WithCommand("break", "Stop script execution",
+            async execContext =>
+            {
+                await scriptResource.BreakAsync();
+                return CommandResults.Success();
+            },
+            new CommandOptions
+            {
+                ConfirmationMessage = "Are you sure you want to stop the script?",
+                Description = "Stop script execution",
+                IconName = "Stop",
+                IsHighlighted = true,
+                IconVariant = IconVariant.Filled,
+                UpdateState = updateContext =>
+                    updateContext.ResourceSnapshot.State?.Text != KnownResourceStates.Running ?
+                        ResourceCommandState.Disabled :
+                        ResourceCommandState.Enabled
+            });
     }
 
     /// <summary>

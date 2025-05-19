@@ -27,7 +27,8 @@ public static class DistributedApplicationBuilderExtensions
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("Value cannot be null or whitespace.", nameof(name));
 
-        if (builder.Resources.OfType<PowerShellRunspacePoolResource>().Any(r => r.Name == name))
+        if (builder.Resources.OfType<PowerShellRunspacePoolResource>().Any(
+            rsp => rsp.Name == name))
         {
             throw new DistributedApplicationException("AddPowerShell failed",
                 new InvalidOperationException(
