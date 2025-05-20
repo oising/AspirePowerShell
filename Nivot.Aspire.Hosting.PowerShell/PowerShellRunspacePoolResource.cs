@@ -60,13 +60,33 @@ public class PowerShellRunspacePoolResource(
             };
 
             await notificationService.PublishUpdateAsync(this,
-                state => state with
-                {
-                    State = knownState,
-                    Properties = [.. state.Properties,
+                state => {
+                    state = state with
+                    {
+                        State = knownState,
+                        Properties = [.. state.Properties,
                         new("RunspacePoolState", poolState.ToString()),
                         new("Reason", reason?.ToString() ?? string.Empty)
-                    ]
+                        ]
+                    };
+
+                    if (knownState == KnownResourceStates.Running)
+                    {
+                        state = state with
+                        {
+                            StartTimeStamp = DateTime.Now,
+                        };
+                    }
+
+                    if (KnownResourceStates.TerminalStates.Contains(knownState))
+                    {
+                        state = state with
+                        {
+                            StopTimeStamp = DateTime.Now,
+                        };
+                    }
+
+                    return state;
                 });
         };
     }

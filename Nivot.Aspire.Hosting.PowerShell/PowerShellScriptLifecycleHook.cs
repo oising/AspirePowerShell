@@ -10,19 +10,19 @@ internal class PowerShellScriptLifecycleHook(ResourceNotificationService notific
     {
         var scripts = appModel.Resources.OfType<PowerShellScriptResource>().ToList();
         
-        foreach (var resource in scripts)
+        foreach (var scriptResource in scripts)
         {
-            var scriptName = resource.Name;
+            var scriptName = scriptResource.Name;
             var scriptLogger = loggerService.GetLogger(scriptName);
             try
             {
                 // TODO: capture script streams and log them
                 scriptLogger.LogInformation("Starting script '{ScriptName}'", scriptName);
 
-                _ =  notificationService
-                        .WaitForDependenciesAsync(resource, cancellationToken)
+                _ = notificationService
+                        .WaitForDependenciesAsync(scriptResource, cancellationToken)
                         .ContinueWith(
-                            async (_) => await resource.StartAsync(scriptLogger, notificationService, cancellationToken),
+                            async (_) => await scriptResource.StartAsync(scriptLogger, notificationService, cancellationToken),
                             cancellationToken);
             }
             catch (Exception ex)

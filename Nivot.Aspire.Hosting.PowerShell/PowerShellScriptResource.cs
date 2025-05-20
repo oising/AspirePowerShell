@@ -107,13 +107,35 @@ namespace Nivot.Aspire.Hosting.PowerShell
                 };
 
                 await notificationService.PublishUpdateAsync(this,
-                    state => state with
+                    state =>
                     {
-                        State = knownState,
-                        Properties = [.. state.Properties,
-                        new( "PSInvocationState", args.InvocationStateInfo.State.ToString() ),
-                        new( "Reason", args.InvocationStateInfo.Reason?.Message ?? string.Empty ),
-                    ],
+                        state = state with
+                        {
+                            State = knownState,
+                            Properties = [
+                                .. state.Properties,
+                                new( "PSInvocationState", args.InvocationStateInfo.State.ToString() ),
+                                new( "Reason", args.InvocationStateInfo.Reason?.Message ?? string.Empty ),
+                            ]
+                        };
+
+                        if (knownState == KnownResourceStates.Running)
+                        {
+                            state = state with
+                            {
+                                StartTimeStamp = DateTime.Now,
+                            };
+                        }
+
+                        if (KnownResourceStates.TerminalStates.Contains(knownState))
+                        {
+                            state = state with
+                            {
+                                StopTimeStamp = DateTime.Now,
+                            };
+                        }
+
+                        return state;
                     });
             };
 
