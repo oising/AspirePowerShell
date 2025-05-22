@@ -1,15 +1,31 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Library</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Library</OutputType>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Title>Aspire PowerShell Hosting Package</Title>
+		<Authors>oisin</Authors>
+		<Description>Run powershell scripts in-process with your Aspire AppHost, injecting aspire resources and/or object instances as variables, using the command lines tools of your choice like azure cli, azd, or any other terminal tools.</Description>
+		<RepositoryUrl>https://github.com/oising/AspirePowerShell</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>aspire; powershell; pwsh; hosting; automation; scripting</PackageTags>
+		<PackageReleaseNotes>First public release.</PackageReleaseNotes>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<IncludeSymbols>True</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Aspire.Hosting" Version="9.3.0" />
-    <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.4.10" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Aspire.Hosting" Version="9.3.0" />
+		<PackageReference Include="Microsoft.PowerShell.SDK" Version="7.4.10" />
+	</ItemGroup>
 
+	<ItemGroup>
+		<None Include="README.md" Pack="true" PackagePath="\"/>
+	</ItemGroup>
 </Project>
