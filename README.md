@@ -2,8 +2,6 @@
 
 ## About
 
-NOTE: This is not yet available as an Aspire Hosting package. This is a proof of concept, albeit a fairly solid one.
-
 Script your resources, use the pwsh (powershell core) engine and reference connectionstring expressions, live resources, dotnet instances or whatever else is in scope for your AppHost. 
 
 
