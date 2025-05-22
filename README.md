@@ -1,5 +1,7 @@
 # Aspire PowerShell Scripting
 
+[![Release to NuGet](https://github.com/oising/AspirePowerShell/actions/workflows/release.yml/badge.svg)](https://github.com/oising/AspirePowerShell/actions/workflows/release.yml)
+
 ## About
 
 Script your resources, use the pwsh (powershell core) engine and reference connectionstring expressions, live resources, dotnet instances or whatever else is in scope for your AppHost. 
