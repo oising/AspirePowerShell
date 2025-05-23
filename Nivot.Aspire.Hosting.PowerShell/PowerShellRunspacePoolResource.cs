@@ -18,9 +18,11 @@ public class PowerShellRunspacePoolResource(
     : Resource(name), IDisposable, IResourceWithWaitSupport
 {
     public PSLanguageMode LanguageMode { get; } = languageMode;
-    public int MinRunspaces { get; } = minRunspaces;
-    public int MaxRunspaces { get; } = maxRunspaces;
 
+    public int MinRunspaces { get; } = minRunspaces;
+    
+    public int MaxRunspaces { get; } = maxRunspaces;
+    
     public RunspacePool? Pool { get; private set; }
 
     internal Task StartAsync(InitialSessionState sessionState, ResourceNotificationService notificationService, ILogger logger, CancellationToken token = default)

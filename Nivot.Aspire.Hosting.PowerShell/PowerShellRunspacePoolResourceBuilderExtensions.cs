@@ -1,6 +1,8 @@
 ﻿using System.Management.Automation;
 using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Nivot.Aspire.Hosting.PowerShell;
 
@@ -28,6 +30,32 @@ public static class PowerShellRunspacePoolResourceBuilderExtensions
         var scriptBlock = ScriptBlock.Create(script);
 
         var scriptResource = new PowerShellScriptResource(name, scriptBlock, builder.Resource);
+
+        builder.ApplicationBuilder.Eventing.Subscribe<InitializeResourceEvent>(scriptResource, (e, ct) =>
+        {
+            var loggerService = e.Services.GetRequiredService<ResourceLoggerService>();
+            var notificationService = e.Services.GetRequiredService<ResourceNotificationService>();
+
+            var scriptName = scriptResource.Name;
+            var scriptLogger = loggerService.GetLogger(scriptName);
+            try
+            {
+                // TODO: capture script streams and log them
+                scriptLogger.LogInformation("Starting script '{ScriptName}'", scriptName);
+
+                _ = notificationService
+                    .WaitForDependenciesAsync(scriptResource, ct)
+                    .ContinueWith(
+                        async (_) => await scriptResource.StartAsync(scriptLogger, notificationService, ct),
+                        ct);
+            }
+            catch (Exception ex)
+            {
+                scriptLogger.LogError(ex, "Failed to start script '{ScriptName}'", scriptName);
+            }
+
+            return Task.CompletedTask;
+        });
 
         return builder.ApplicationBuilder
             .AddResource(scriptResource)

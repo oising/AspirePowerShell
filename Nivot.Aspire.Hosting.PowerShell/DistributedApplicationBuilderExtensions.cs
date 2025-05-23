@@ -1,8 +1,11 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics;
+using System.Globalization;
 using System.Management.Automation;
+using System.Management.Automation.Runspaces;
 using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Lifecycle;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Nivot.Aspire.Hosting.PowerShell;
 
@@ -39,10 +42,43 @@ public static class DistributedApplicationBuilderExtensions
                         "A PowerShell resource with the name '{0}' already exists.", name)));
         }
 
-        builder.Services.TryAddLifecycleHook<PowerShellRunspacePoolLifecycleHook>();
-        builder.Services.TryAddLifecycleHook<PowerShellScriptLifecycleHook>();
-
         var pool = new PowerShellRunspacePoolResource(name, languageMode, minRunspaces, maxRunspaces);
+
+        builder.Eventing.Subscribe<AfterEndpointsAllocatedEvent>(async (e, ct) =>
+        {
+            var pools = e.Model.Resources.OfType<PowerShellRunspacePoolResource>().ToList();
+
+            foreach (var poolResource in pools)
+            {
+                Debug.Assert(poolResource is not null);
+
+                var loggerService = e.Services.GetRequiredService<ResourceLoggerService>();
+                var notificationService = e.Services.GetRequiredService<ResourceNotificationService>();
+
+                var sessionState = InitialSessionState.CreateDefault();
+
+                foreach (var annotation in poolResource.Annotations)
+                {
+                    if (annotation is PowerShellVariableReferenceAnnotation<ConnectionStringReference> reference)
+                    {
+                        var connectionString = await reference.Value.Resource.GetConnectionStringAsync(ct);
+                        sessionState.Variables.Add(
+                            new SessionStateVariableEntry(reference.Name, connectionString,
+                                $"ConnectionString for {reference.Value.Resource.GetType().Name} '{reference.Name}'",
+                                ScopedItemOptions.ReadOnly | ScopedItemOptions.AllScope));
+                    }
+                }
+
+                var poolName = poolResource.Name;
+                var poolLogger = loggerService.GetLogger(poolName);
+
+                _ = notificationService.WaitForDependenciesAsync(poolResource, ct)
+                    .ContinueWith(
+                        async _ =>
+                            await poolResource.StartAsync(sessionState, notificationService, poolLogger, ct),
+                        ct);
+            }
+        });
 
         return builder.AddResource(pool)
             .WithInitialState(new()
