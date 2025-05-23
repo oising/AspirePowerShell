@@ -9,7 +9,7 @@ var ps = builder.AddPowerShell("ps")
     .WithReference(blob)
     .WaitFor(storage);
 
-var script = ps.AddScript("script1", """
+var script1 = ps.AddScript("script1", """
     param($x, $y)
 
     write-information "Hello, world"
@@ -27,6 +27,11 @@ var script = ps.AddScript("script1", """
 
     write-information "Blob uploaded"
 """).WithArgs(2, 2);
+
+var script2 = ps.AddScript("script2", """
+    write-information "Hello, world from script2"
+    """)
+    .WaitForCompletion(script1);
 
 builder.Build().Run();
 
