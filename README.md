@@ -57,3 +57,4 @@ JetBrains Rider (sorry, doesn't work in Visual Studio) is able to provide hints 
 
 ![image](https://github.com/user-attachments/assets/9c65528d-5afd-4aeb-a08b-f6597555dece)
 
+Thanks to @akarpov89 at JetBrains for this tip!
