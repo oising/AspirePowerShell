@@ -49,3 +49,11 @@ builder.Build().Run();
 While your Apphost is running a script that is waiting via `Wait-Debugger`, open a terminal with powershell (pwsh) 7.4 or later (win, osx, linux) and use `Get-PSHostProcessInfo`, `Enter-PSHostProcess`, `Get-Runspace` and `Debug-Runspace` to connect the debugger. 
 
 See https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/enter-pshostprocess?view=powershell-7.5 for more information.
+
+## Intellisense
+
+JetBrains Rider (sorry, doesn't work in Visual Studio) is able to provide hints as to the contexts of strings, so because the parameter is annotated with `[StringSyntax("PowerShell")]`, if the PowerShell plugin is installed you'll get language support:
+
+
+![image](https://github.com/user-attachments/assets/9c65528d-5afd-4aeb-a08b-f6597555dece)
+
