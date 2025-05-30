@@ -2,6 +2,10 @@
 
 [![Release to NuGet](https://github.com/oising/AspirePowerShell/actions/workflows/release.yml/badge.svg)](https://github.com/oising/AspirePowerShell/actions/workflows/release.yml)
 
+## Installation
+
+Add the NuGet package https://www.nuget.org/packages/Nivot.Aspire.Hosting.PowerShell to your Aspire AppHost project.
+
 ## About
 
 Script your resources, use the pwsh (powershell core) engine and reference connectionstring expressions, live resources, dotnet instances or whatever else is in scope for your AppHost. 
