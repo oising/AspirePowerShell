@@ -1,5 +1,9 @@
 # Aspire PowerShell Scripting
 
+## 
+
+NOTE: This project has been submitted and merged into https://github.com/CommunityToolkit/Aspire community repo. Future releases will ship there.  
+
 [![Release to NuGet](https://github.com/oising/AspirePowerShell/actions/workflows/release.yml/badge.svg)](https://github.com/oising/AspirePowerShell/actions/workflows/release.yml)
 
 ## Installation
